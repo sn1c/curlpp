@@ -69,6 +69,9 @@ namespace curlpp
         void addContent(const std::string& name, const std::string& value);
         void addContent(const std::string& name, const std::string& value, const std::string& type);
 
+        void addFile(const std::string& name, const std::string& filename);
+        void addFile(const std::string& name, const std::string& filename, const std::string& type);
+
     private:
         handleType* last_ = nullptr;
         handleType* post_ = nullptr;
@@ -275,6 +278,44 @@ inline void curlpp::Form::addContent(const std::string& name, const std::string&
         CURLFORM_CONTENTTYPE,
         type.c_str(),
         CURLFORM_END
+    );
+
+    if (error != CURL_FORMADD_OK)
+    {
+        throw FormException(error);
+    }
+}
+
+inline void curlpp::Form::addFile(const std::string& name, const std::string& filename)
+{
+    const codeType error = curl_formadd(
+            &post_,
+            &last_,
+            CURLFORM_COPYNAME,
+            name.c_str(),
+            CURLFORM_FILE,
+            filename.c_str(),
+            CURLFORM_END
+    );
+
+    if (error != CURL_FORMADD_OK)
+    {
+        throw FormException(error);
+    }
+}
+
+inline void curlpp::Form::addFile(const std::string& name, const std::string& filename, const std::string& type)
+{
+    const codeType error = curl_formadd(
+            &post_,
+            &last_,
+            CURLFORM_COPYNAME,
+            name.c_str(),
+            CURLFORM_FILE,
+            filename.c_str(),
+            CURLFORM_CONTENTTYPE,
+            type.c_str(),
+            CURLFORM_END
     );
 
     if (error != CURL_FORMADD_OK)
