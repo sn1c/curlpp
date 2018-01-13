@@ -158,7 +158,9 @@ inline std::size_t curlpp::write::toString(char* data, std::size_t size, std::si
 // Easy
 inline curlpp::Easy::Easy()
     : handle_(curl_easy_init())
-{}
+{
+    setOpt(CURLOPT_WRITEFUNCTION, write::none);
+}
 
 inline curlpp::Easy::~Easy()
 {
