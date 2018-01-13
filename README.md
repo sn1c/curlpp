@@ -6,6 +6,3 @@ This wrapper is header-only which means all you need to do is to copy the `src/c
 
 ## Examples
 See `examples` directory for some basic examples.
-
-## License
-MIT
