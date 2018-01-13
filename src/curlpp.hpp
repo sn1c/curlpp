@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <initializer_list>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <curl/curl.h>
@@ -15,6 +16,7 @@ namespace curlpp
     namespace write
     {
         std::size_t none(char*, std::size_t size, std::size_t nmemb, void*);
+        std::size_t toStream(char* data, std::size_t size, std::size_t nmemb, std::ostream* stream);
         std::size_t toString(char* data, std::size_t size, std::size_t nmemb, std::string* string);
     }
 
@@ -140,6 +142,19 @@ inline void curlpp::cleanup()
 // write
 inline std::size_t curlpp::write::none(char*, std::size_t size, std::size_t nmemb, void*)
 {
+    return size * nmemb;
+}
+
+inline std::size_t curlpp::write::toStream(char* data, std::size_t size, std::size_t nmemb, std::ostream* stream)
+{
+    if (!stream)
+    {
+        return 0;
+    }
+
+    stream->write(data, size * nmemb);
+    stream->flush();
+
     return size * nmemb;
 }
 
