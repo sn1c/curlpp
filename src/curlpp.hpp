@@ -13,6 +13,12 @@ namespace curlpp
     void init(long flags = CURL_GLOBAL_DEFAULT);
     void cleanup();
 
+    namespace util
+    {
+        std::string escape(const std::string& string);
+        std::string unescape(const std::string& string);
+    }
+
     namespace write
     {
         std::size_t none(char*, std::size_t size, std::size_t nmemb, void*);
@@ -36,6 +42,9 @@ namespace curlpp
         Easy& operator=(const Easy&) = delete;
 
         handleType* getHandle();
+
+        std::string escape(std::string string);
+        std::string unescape(std::string string);
 
         void pause(int bitmask);
         void perform();
@@ -142,6 +151,19 @@ inline void curlpp::cleanup()
     curl_global_cleanup();
 }
 
+// util
+inline std::string curlpp::util::escape(const std::string& string)
+{
+    static Easy easy;
+    return easy.escape(string);
+}
+
+inline std::string curlpp::util::unescape(const std::string& string)
+{
+    static Easy easy;
+    return easy.unescape(string);
+}
+
 // write
 inline std::size_t curlpp::write::none(char*, std::size_t size, std::size_t nmemb, void*)
 {
@@ -188,6 +210,29 @@ inline curlpp::Easy::~Easy()
 inline curlpp::Easy::handleType* curlpp::Easy::getHandle()
 {
     return handle_;
+}
+
+inline std::string curlpp::Easy::escape(std::string string)
+{
+    char* ret = curl_easy_escape(handle_, string.c_str(), string.size());
+
+    string = std::string(ret);
+
+    curl_free(ret);
+
+    return string;
+}
+
+inline std::string curlpp::Easy::unescape(std::string string)
+{
+    int out = 0;
+    char* ret = curl_easy_unescape(handle_, string.c_str(), string.size(), &out);
+
+    string = std::string(ret, out);
+
+    curl_free(ret);
+
+    return string;
 }
 
 inline void curlpp::Easy::pause(int bitmask)
